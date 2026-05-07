@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Wakuwaku Production — Content Creation Dashboard</title>
+<!-- v3.2: keep original UI/login/Section A/media, remove only visible Direction/Plan flow, add matching + 1:1 handoff -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -487,7 +488,7 @@
         <div>
           <div class="hero-eyebrow">Content Creation Suite · Campaign Overview</div>
           <h1 id="hero-title">Campaign <em>Name</em></h1>
-          <p id="hero-desc">Plan, generate, and revise multi-channel content guided by your brand category map.</p>
+          <p id="hero-desc">Manage generated assets, media uploads, Drive references, matching config, and 1:1 handoff in the original dashboard flow.</p>
         </div>
         <div class="hero-actions">
           <button class="btn" onclick="openCampaignModal()">
@@ -580,8 +581,8 @@
 
       <div class="table-toolbar" data-html2canvas-ignore>
         <div>
-          <div class="toolbar-title">Generated only · no Direction Hub / no Plan & Generate</div>
-          <div class="toolbar-copy">เพิ่มงาน, อัปโหลดรูป/วิดีโอ/สื่อ, ผูก Drive link, ตั้ง publish date และ match H2/H3 จาก Excel ได้ในหน้าตารางนี้</div>
+          <div class="toolbar-title">Generated Assets Workflow</div>
+          <div class="toolbar-copy">เพิ่มงาน, อัปโหลดรูป/วิดีโอ/สื่อ, ผูก Drive link, ตั้ง publish date และ match H2/H3 จาก Excel ได้ โดยยังยึด UI เดิม</div>
         </div>
         <button class="btn" onclick="openConfigModal()">Upload Excel / Matching</button>
       </div>
@@ -620,7 +621,7 @@
         </div>
       </div>
 
-      <!-- Hidden compatibility stubs for removed Direction Hub / Plan Generate code paths -->
+      <!-- Hidden compatibility stubs for legacy removed module code paths -->
       <div class="hidden" aria-hidden="true">
         <div id="hub-empty"></div><div id="hub-loading"></div><div id="hub-results"></div><div id="hub-tag"></div>
         <div id="hub-tone"></div><div id="hub-pillars"></div><div id="hub-mood"></div>
@@ -701,21 +702,6 @@
     <div class="simple-modal-footer"><button class="btn" onclick="closeConnectModal()">Cancel</button><button class="btn primary" onclick="saveDriveLinks()">Save Links</button></div>
   </div>
 </div>
-
-<!-- Direction Hub Edit -->
-<div class="simple-overlay" id="directionModal">
-  <div class="simple-modal">
-    <div class="simple-modal-head"><h3>Edit Direction Hub</h3><button class="close-btn" onclick="closeDirectionModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
-    <div class="simple-modal-body">
-      <div class="input-group"><label>Tone of Voice</label><input type="text" id="dirTone" /></div>
-      <div class="input-group"><label>Brand Pillars</label><input type="text" id="dirPillars" /></div>
-      <div class="input-group"><label>Visual Mood</label><input type="text" id="dirMood" /></div>
-    </div>
-    <div class="simple-modal-footer"><button class="btn" onclick="closeDirectionModal()">Cancel</button><button class="btn primary" onclick="saveDirectionManual()">Save Direction</button></div>
-  </div>
-</div>
-
-
 
 <!-- Campaign Modal: add/separate client workspaces -->
 <div class="simple-overlay" id="campaignModal">
@@ -1465,7 +1451,7 @@ function generateAutoPlan() {
       logAction('SYSTEM', `Auto-planned asset: ${topic}`);
     });
     btn.disabled = false;
-    txt.textContent = 'Auto-Plan & Generate';
+    txt.textContent = 'Generate Assets';
     sp.classList.add('hidden');
     renderAssets();
     document.querySelector('.content-table').scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1501,11 +1487,11 @@ function runChecklist() {
     checks.push({ status: 'warn', label: 'No input files linked', detail: 'Optional but recommended for context' });
   }
   
-  // 3. Direction Hub set
+  // 3. Legacy input context set
   if (directionHub.tone && directionHub.pillars && directionHub.mood) {
     checks.push({ status: 'pass', label: 'Brand direction captured', detail: 'Tone, pillars, and visual mood defined' });
   } else {
-    checks.push({ status: 'warn', label: 'Direction Hub incomplete', detail: 'Add tone of voice, brand pillars, and visual mood' });
+    checks.push({ status: 'warn', label: 'Input context incomplete', detail: 'Add input context if needed' });
   }
   
   // 4. Has assets
@@ -2854,7 +2840,7 @@ async function buildHandoffBundle() {
   const camp = currentCampaign();
   const assets = campaignAssets();
   const folder = zip.folder(`${safeSlug(camp.client)}_${safeSlug(camp.campaign)}_1to1_Handoff`);
-  folder.file('campaign-data.json', JSON.stringify({ handoffMeta:{ generatedAt:new Date().toISOString(), generatedBy:$('sb-name')?.textContent || 'Wakuwaku', bundleVersion:'3.1-restored-original-ui', scope:'current-campaign-only' }, campaign:camp, assets, sectionA:{ driveLinks:cloneDriveLinks(), linkedFilesCount }, matchingConfig:camp.matchingConfig, accessGrants:campaignGrants(), accessModel:buildAccessModel() }, null, 2));
+  folder.file('campaign-data.json', JSON.stringify({ handoffMeta:{ generatedAt:new Date().toISOString(), generatedBy:$('sb-name')?.textContent || 'Wakuwaku', bundleVersion:'3.2-keep-original-ui', scope:'current-campaign-only' }, campaign:camp, assets, sectionA:{ driveLinks:cloneDriveLinks(), linkedFilesCount }, matchingConfig:camp.matchingConfig, accessGrants:campaignGrants(), accessModel:buildAccessModel() }, null, 2));
   folder.file('campaign-assets.csv', makeAssetsCSV(assets));
   folder.file('activity-log.json', JSON.stringify(activityLog.filter(x => true), null, 2));
   const pdfDoc = generatePDFReport(); if (pdfDoc) folder.file('final-report.pdf', pdfDoc.output('blob'));
@@ -2878,7 +2864,7 @@ function downloadBlob(blob, filename) { const a = document.createElement('a'); a
 async function downloadBundleZIP() { try { const zip = await buildHandoffBundle(); const blob = await zip.generateAsync({ type:'blob' }); downloadBlob(blob, `${safeSlug(currentCampaign().campaign)}_1to1_bundle_${new Date().toISOString().slice(0,10)}.zip`); logAction('EXPORT', `Downloaded 1:1 bundle for ${currentCampaign().campaign}`); } catch(e) { showToast('Bundle failed: ' + e.message, 'err'); } }
 async function finalizeHandoff() {
   showConfirm('Finalize 1:1 handoff?', 'This exports the current campaign only, locks the snapshot, and separates client handoff from internal workspace.', async () => {
-    try { const zip = await buildHandoffBundle(); const blob = await zip.generateAsync({ type:'blob' }); downloadBlob(blob, `${safeSlug(currentCampaign().campaign)}_FINAL_1to1_${new Date().toISOString().slice(0,10)}.zip`); const camp = currentCampaign(); camp.status = 'handed-off'; camp.handoffInfo = { date:new Date().toISOString(), assetCount:campaignAssets().length, grants:campaignGrants().length, bundleVersion:'3.1-restored-original-ui' }; logAction('HANDOFF', `Finalized 1:1 handoff for ${camp.client} / ${camp.campaign}`); updateCampaignUI(); renderAssets(); closeChecklistModal(); forceSave(); } catch(e) { showToast('Finalization failed: ' + e.message, 'err'); } });
+    try { const zip = await buildHandoffBundle(); const blob = await zip.generateAsync({ type:'blob' }); downloadBlob(blob, `${safeSlug(currentCampaign().campaign)}_FINAL_1to1_${new Date().toISOString().slice(0,10)}.zip`); const camp = currentCampaign(); camp.status = 'handed-off'; camp.handoffInfo = { date:new Date().toISOString(), assetCount:campaignAssets().length, grants:campaignGrants().length, bundleVersion:'3.2-keep-original-ui' }; logAction('HANDOFF', `Finalized 1:1 handoff for ${camp.client} / ${camp.campaign}`); updateCampaignUI(); renderAssets(); closeChecklistModal(); forceSave(); } catch(e) { showToast('Finalization failed: ' + e.message, 'err'); } });
 }
 function reopenForRevise() { const camp = currentCampaign(); camp.status = 'active'; camp.handoffInfo = null; logAction('SYSTEM', 'Re-opened current campaign after handoff'); updateCampaignUI(); renderAssets(); }
 
@@ -2893,7 +2879,7 @@ function loadData(data) {
   updateCampaignUI(); renderAssets(); renderHistory(); populateDatalistsFromMatching(); showToast('Handoff package loaded');
 }
 
-// INIT: no Plan & Generate render calls; preserve Google login and Section A.
+// INIT: preserve Google login, Section A, Drive references, media upload, and original UI.
 window.onload = () => {
   initGoogleAuth();
   normalizeDataAfterLoad();
